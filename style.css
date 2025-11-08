@@ -1,0 +1,145 @@
+body {
+  background-color: #f8f9fa;
+}
+
+.container-fluid {
+  padding: 0;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding: 20px;
+  border-right: 1px solid #dee2e6;
+}
+
+.sidebar h4 {
+  color: #333;
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  display: none;
+}
+
+/* New Chat Button */
+.sidebar .btn-dark {
+  background-color: #212529;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+/* Chat List Buttons */
+.chat-btn {
+  width: 100%;
+  margin: 5px 0;
+  text-align: left;
+  background-color: transparent;
+  color: #495057;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.chat-btn:hover {
+  background-color: #e9ecef;
+}
+
+/* Model Selector Area */
+.model-selector {
+  background-color: #ff8c00;
+  padding: 15px 30px;
+  color: white;
+}
+
+.model-selector h4 {
+  font-size: 1.4rem;
+}
+
+.model-selector .form-select {
+  background-color: white;
+  border: none;
+  width: 200px !important;
+  border-radius: 4px;
+}
+
+/* Chat Area */
+.chat-area {
+  background-color: white;
+  border-radius: 10px;
+  min-height: 70vh;
+  margin: 20px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Chat Messages */
+.message {
+  max-width: 80%;
+  margin: 10px 0;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.user-message {
+  align-self: flex-end;
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+.bot-message {
+  align-self: flex-start;
+  background-color: #e9ecef;
+  color: #212529;
+}
+
+/* Input Area */
+.input-group {
+  padding: 0 20px;
+  margin-bottom: 20px;
+}
+
+.chat-input {
+  border-radius: 8px !important;
+  border: 1px solid #dee2e6;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+}
+
+.input-group .btn-dark {
+  border-radius: 8px;
+  padding: 12px 25px;
+  background-color: #212529;
+  margin-left: 10px;
+}
+
+/* Social Links */
+.social-links {
+  position: fixed;
+  bottom: 20px;
+  display: flex;
+  gap: 15px;
+}
+
+.social-links a {
+  color: #6c757d;
+  text-decoration: none;
+  font-size: 1.2rem;
+  transition: color 0.3s;
+}
+
+.social-links a:hover {
+  color: #495057;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    min-height: auto;
+    border-right: none;
+    border-bottom: 1px solid #dee2e6;
+  }
+}
