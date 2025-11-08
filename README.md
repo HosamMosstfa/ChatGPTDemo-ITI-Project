@@ -1,1 +1,0 @@
-# ChatGPT5-ITI-Project
