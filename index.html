@@ -1,70 +1,329 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Chat Demo</title>
-    <link rel="stylesheet" href="style.css" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"
+    />
+    <title>ChatGPT Demo — ITI Practice</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap 5.3 & Icons -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+    <!-- Highlight.js for Code Syntax Highlighting -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-md-3 sidebar">
-          <h4>AI Chat Demo</h4>
-          <button class="btn btn-dark w-100" id="new-chat-btn">New Chat</button>
+    <div class="app-wrapper">
+      <!-- Mobile Overlay -->
+      <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-          <div class="chat-list">
-            <button class="chat-btn active-chat" id="chat1">Chat 1</button>
-            <button class="chat-btn" id="chat2">Chat 2</button>
-            <button class="chat-btn" id="chat3">Chat 3</button>
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="brand">
+            <div class="brand-icon">
+              <i class="bi bi-chat-square-dots-fill"></i>
+            </div>
+            <div class="brand-text">
+              <span class="brand-title">ChatGPT <strong>Demo</strong></span>
+              <span class="brand-badge">ITI Practice</span>
+            </div>
           </div>
-
-          <div class="social-links">
-            <a href="#"><i class="bi bi-facebook"></i></a>
-            <a href="#"><i class="bi bi-linkedin"></i></a>
-            <a href="#"><i class="bi bi-youtube"></i></a>
-            <a href="#"><i class="bi bi-instagram"></i></a>
-          </div>
+          <button class="btn btn-icon d-lg-none" id="close-sidebar-btn" aria-label="Close Sidebar">
+            <i class="bi bi-x-lg"></i>
+          </button>
         </div>
 
-        <div class="col-md-9">
-          <div class="model-selector mb-3">
-            <div class="d-flex justify-content-between align-items-center">
-              <h4 class="m-0">AI Chat Demo</h4>
-              <select class="form-select w-25" id="model-select">
-                <option value="text" selected>Text Model (GPT)</option>
-                <option value="image">Image Generator (Playground v2)</option>
+        <button class="btn btn-primary-glow w-100 mb-3" id="new-chat-btn">
+          <i class="bi bi-plus-lg me-2"></i>New Chat
+        </button>
+
+        <div class="search-box mb-3">
+          <i class="bi bi-search"></i>
+          <input type="text" id="search-chats" placeholder="Search conversations..." />
+        </div>
+
+        <div class="chat-list-label">RECENT CONVERSATIONS</div>
+        <div class="chat-list" id="chat-list"></div>
+
+        <div class="sidebar-footer">
+          <button class="footer-btn" id="export-chat-btn" title="Export Current Chat">
+            <i class="bi bi-download"></i>
+            <span>Export Markdown</span>
+          </button>
+          <button class="footer-btn" data-bs-toggle="modal" data-bs-target="#settingsModal">
+            <i class="bi bi-gear"></i>
+            <span>API & Settings</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Workspace -->
+      <main class="main-content">
+        <!-- Top Navbar -->
+        <header class="top-bar">
+          <div class="top-bar-left">
+            <button class="btn btn-icon d-lg-none" id="open-sidebar-btn" aria-label="Open Sidebar">
+              <i class="bi bi-list fs-5"></i>
+            </button>
+
+            <div class="model-dropdown-wrapper">
+              <i class="bi bi-cpu text-accent"></i>
+              <select class="model-select" id="model-select" aria-label="Select AI Model">
+                <optgroup label="Free Models (OpenRouter)" id="text-models-group">
+                  <option value="text|openrouter/free" selected>
+                    Auto Free Router (Best Active)
+                  </option>
+                  <option value="text|meta-llama/llama-3.3-70b-instruct:free">
+                    Llama 3.3 70B (Free)
+                  </option>
+                </optgroup>
+                <optgroup label="Image Generation" id="image-models-group">
+                  <option value="image|pollinations">FLUX Studio (Image Gen)</option>
+                </optgroup>
               </select>
+              <button
+                type="button"
+                class="btn-refresh-inline"
+                id="refresh-models-btn"
+                title="Refresh free models"
+              >
+                <i class="bi bi-arrow-repeat"></i>
+              </button>
             </div>
           </div>
 
-          <div class="chat-area" id="chat-area"></div>
+          <div class="top-bar-right">
+            <span class="header-pill d-none d-md-inline-flex">
+              <i class="bi bi-mortarboard-fill me-1"></i>ITI Practice
+            </span>
+            <button class="btn btn-icon" id="clear-chat-btn" title="Clear Messages">
+              <i class="bi bi-eraser"></i>
+            </button>
+            <button class="btn btn-icon" id="theme-toggle-btn" title="Toggle Theme">
+              <i class="bi bi-sun-fill" id="theme-icon"></i>
+            </button>
+          </div>
+        </header>
 
-          <form class="input-group">
-            <input
-              id="prompt"
-              name="prompt"
-              type="text"
-              class="form-control chat-input"
-              placeholder="Type your message or image description..."
-              autocomplete="off"
-            />
-            <button type="submit" class="btn btn-dark">Send</button>
-          </form>
+        <!-- Chat Area -->
+        <div class="chat-area" id="chat-area">
+          <!-- Welcome Screen -->
+          <div class="welcome-screen" id="welcome-screen">
+            <div class="welcome-logo">
+              <i class="bi bi-chat-square-dots-fill"></i>
+            </div>
+            <div class="welcome-tag">ITI PRACTICE PROJECT</div>
+            <h1>ChatGPT Demo</h1>
+            <p class="welcome-subtitle">
+              Ask anything, write clean code, paste screenshots for instant UI analysis, or generate
+              high-resolution images.
+            </p>
+            <div class="starter-grid">
+              <button
+                class="starter-card"
+                data-prompt="Write a clean, reusable REST API fetch wrapper in JavaScript with async/await and error handling."
+                data-mode="text"
+              >
+                <div class="starter-icon text-info">
+                  <i class="bi bi-code-slash"></i>
+                </div>
+                <div class="starter-info">
+                  <strong>JS Fetch Wrapper</strong>
+                  <span>Clean REST API helper with error handling</span>
+                </div>
+              </button>
+              <button
+                class="starter-card"
+                data-prompt="Explain Clean Architecture in .NET with a practical folder structure example."
+                data-mode="text"
+              >
+                <div class="starter-icon text-warning">
+                  <i class="bi bi-diagram-3"></i>
+                </div>
+                <div class="starter-info">
+                  <strong>Clean Architecture</strong>
+                  <span>Practical .NET layers & folder structure</span>
+                </div>
+              </button>
+              <button
+                class="starter-card"
+                data-prompt="A sleek futuristic developer desk setup at night, emerald and warm ambient lighting, ultra detailed, 8k"
+                data-mode="image"
+              >
+                <div class="starter-icon text-success">
+                  <i class="bi bi-image"></i>
+                </div>
+                <div class="starter-info">
+                  <strong>Generate Workspace Art</strong>
+                  <span>Create a futuristic desk setup image</span>
+                </div>
+              </button>
+              <button
+                class="starter-card"
+                data-prompt="Give me 5 full-stack portfolio project ideas that stand out in technical interviews."
+                data-mode="text"
+              >
+                <div class="starter-icon text-primary">
+                  <i class="bi bi-lightbulb"></i>
+                </div>
+                <div class="starter-info">
+                  <strong>Portfolio Project Ideas</strong>
+                  <span>5 standout full-stack ideas for interviews</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-container">
+          <div class="input-inner">
+            <!-- Attached Image Preview Bar -->
+            <div class="image-preview-bar" id="image-preview-bar" style="display: none">
+              <div class="preview-thumb-wrap">
+                <img id="preview-thumb-img" src="" alt="Attached preview" />
+                <button
+                  type="button"
+                  class="remove-preview-btn"
+                  id="remove-image-btn"
+                  title="Remove Image"
+                >
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+              <span class="preview-label">
+                <i class="bi bi-eye text-accent me-1"></i>Image attached for Vision analysis
+              </span>
+            </div>
+
+            <form class="chat-form" id="chat-form">
+              <input type="file" id="image-upload-input" accept="image/*" hidden />
+              <button
+                type="button"
+                class="btn-attach"
+                id="attach-image-btn"
+                title="Attach or Paste Image"
+              >
+                <i class="bi bi-paperclip"></i>
+              </button>
+
+              <textarea
+                id="prompt"
+                rows="1"
+                placeholder="Message ChatGPT Demo..."
+                autocomplete="off"
+              ></textarea>
+
+              <button type="submit" class="btn-send" id="send-btn" title="Send Message">
+                <i class="bi bi-arrow-up"></i>
+              </button>
+            </form>
+
+            <div class="input-hint">
+              <span id="mode-badge" class="badge bg-accent-soft">Chat & Vision Mode</span>
+              <span class="hint-tip d-none d-sm-inline"
+                >Press Enter to send • Paste images with Ctrl+V</span
+              >
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-modal">
+          <div class="modal-header border-bottom-custom">
+            <h5 class="modal-title fs-6 fw-bold">
+              <i class="bi bi-sliders me-2 text-accent"></i>ChatGPT Demo — Settings
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">OpenRouter API Key</label>
+              <div class="input-group">
+                <input
+                  type="password"
+                  class="form-control custom-input"
+                  id="api-key-input"
+                  placeholder="sk-or-v1-..."
+                />
+                <button class="btn btn-outline-secondary" type="button" id="toggle-key-vis">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+              <small class="text-muted"> Saved locally in your browser's LocalStorage. </small>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold small">System Instructions (Persona)</label>
+              <textarea
+                class="form-control custom-input"
+                id="system-prompt-input"
+                rows="3"
+                placeholder="You are ChatGPT Demo (ITI Practice), an expert software engineering assistant."
+              ></textarea>
+            </div>
+
+            <div class="mb-2">
+              <div class="d-flex justify-content-between">
+                <label class="form-label fw-semibold small">Creativity (Temperature)</label>
+                <span id="temp-value" class="text-accent fw-bold small">0.7</span>
+              </div>
+              <input
+                type="range"
+                class="form-range"
+                id="temp-input"
+                min="0"
+                max="1.5"
+                step="0.1"
+                value="0.7"
+              />
+            </div>
+          </div>
+          <div class="modal-footer border-top-custom">
+            <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary-glow btn-sm px-3" id="save-settings-btn">
+              Save Changes
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
-    />
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="./script.js"></script>
   </body>
 </html>
